@@ -1,6 +1,5 @@
 import allure
 import pytest
-import time
 
 from pages.main_page import MainPage
 from pages.feed_page import FeedPage
@@ -13,13 +12,11 @@ def _create_order(driver, authorized_user) -> str:
     # Авторизация через UI
     login_page = LoginPage(driver).open()
 
+    # login() сам дожидается редиректа со страницы /login (см. LoginPage)
     login_page.login(
         "21312312312312@mail.ru",
         "1234567"
     )
-
-    # Ждем после входа
-    time.sleep(4)
 
     # Переходим на главную
     page = MainPage(driver).open()
@@ -28,8 +25,8 @@ def _create_order(driver, authorized_user) -> str:
     page.add_ingredient_to_order(BUN_NAME)
     page.add_ingredient_to_order(FILLING_NAME)
 
-    # Ждем после сборки
-    time.sleep(2)
+    # конструкторе (счётчик обновился), прежде чем оформлять заказ
+    page.wait_ingredient_counter_at_least(FILLING_NAME, 1)
 
     # Оформляем заказ
     page.submit_order()

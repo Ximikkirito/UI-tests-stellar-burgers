@@ -1,5 +1,6 @@
 import allure
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.base_page import BasePage
 from utils.js_dnd import drag_and_drop
@@ -91,6 +92,13 @@ class MainPage(BasePage):
     def get_ingredient_counter(self, name: str) -> int:
         text = self.find(self.ingredient_counter(name)).text.strip()
         return int(text) if text.isdigit() else 0
+
+    @allure.step("Дождаться, что счётчик ингредиента «{name}» станет не меньше {expected}")
+    def wait_ingredient_counter_at_least(self, name: str, expected: int, timeout=None):
+        WebDriverWait(self.driver, timeout or self.timeout).until(
+            lambda d: self.get_ingredient_counter(name) >= expected
+        )
+        return self
 
     @allure.step("Кликнуть по ингредиенту «{name}»")
     def click_ingredient(self, name: str):

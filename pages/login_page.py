@@ -5,18 +5,7 @@ from pages.base_page import BasePage
 
 
 class LoginPage(BasePage):
-    """Страница входа /login.
-
-    Реальная структура формы (снята через DevTools):
-        <form class="Auth_form__...">
-          <input type="text" name="name" .../>       -- email
-          <input type="password" name="Пароль" .../>  -- пароль
-          <button>Войти</button>
-        </form>
-    Поля идентифицируются по type, а не по name/label — у email name="name",
-    у пароля name буквально "Пароль" (не англ. "password"), это ненадёжно.
-    """
-
+    """Страница входа /login  """
     url = BasePage.url + "/login"
 
     FORM = (By.CSS_SELECTOR, "form.Auth_form__3qKeq")
@@ -29,4 +18,5 @@ class LoginPage(BasePage):
         self.find(self.EMAIL_INPUT).send_keys(email)
         self.find(self.PASSWORD_INPUT).send_keys(password)
         self.find_clickable(self.LOGIN_BUTTON).click()
+        self.wait_for_url_contains_not("/login")
         return self

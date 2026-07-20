@@ -57,6 +57,32 @@ class BasePage:
         )
         return self.find(locator).text.strip()
 
+    # --- работа с текущим URL страницы ----------------------------------
+    @property
+    def current_url(self) -> str:
+        return self.driver.current_url
+
+    @allure.step("Дождаться, что открыт URL «{expected_url}»")
+    def wait_for_url(self, expected_url: str, timeout=None):
+        WebDriverWait(self.driver, timeout or self.timeout).until(
+            lambda d: d.current_url.rstrip("/") == expected_url.rstrip("/")
+        )
+        return self
+
+    @allure.step("Дождаться, что URL содержит «{substring}»")
+    def wait_for_url_contains(self, substring: str, timeout=None):
+        WebDriverWait(self.driver, timeout or self.timeout).until(
+            lambda d: substring in d.current_url
+        )
+        return self
+
+    @allure.step("Дождаться, что URL перестал содержать «{substring}»")
+    def wait_for_url_contains_not(self, substring: str, timeout=None):
+        WebDriverWait(self.driver, timeout or self.timeout).until(
+            lambda d: substring not in d.current_url
+        )
+        return self
+
     # --- авторизация без прохождения формы логина -----------------------
     @allure.step("Подставить в браузер токены авторизованного пользователя")
     def authorize(self, access_token: str, refresh_token: str):
@@ -75,10 +101,7 @@ class BasePage:
         return self
 
     # --- локаторы, общие для шапки сайта --------------------------------
-    # По реальному DOM: пункты шапки — это <a class="AppHeader_header__link__..."
-    # href="/"|"/feed"|"/account">, текст внутри <p class="AppHeader_header__linkText__...">.
-    # Матчим по href, а не по тексту — надёжнее (в тексте, например,
-    # "Лента Заказов" пишется с заглавной "З", легко ошибиться регистром).
+
     CONSTRUCTOR_LINK = (By.CSS_SELECTOR, "a[href='/']")
     FEED_LINK = (By.CSS_SELECTOR, "a[href='/feed']")
 

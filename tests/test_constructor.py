@@ -17,8 +17,10 @@ class TestConstructorNavigation:
     def test_click_constructor_link_opens_constructor(self, driver):
         page = MainPage(driver).open()
         page.go_to_feed()  # уходим со стартовой страницы
+        page.wait_for_url_contains("/feed")
         page.go_to_constructor()
-        assert driver.current_url.rstrip("/") == MainPage.url.rstrip("/"), (
+        page.wait_for_url(MainPage.url)
+        assert page.current_url.rstrip("/") == MainPage.url.rstrip("/"), (
             "После клика на «Конструктор» должен открыться раздел конструктора"
         )
 
@@ -27,7 +29,8 @@ class TestConstructorNavigation:
     def test_click_feed_link_opens_feed(self, driver):
         page = MainPage(driver).open()
         page.go_to_feed()
-        assert "/feed" in driver.current_url, (
+        page.wait_for_url_contains("/feed")
+        assert "/feed" in page.current_url, (
             "После клика на «Лента заказов» URL должен содержать /feed"
         )
 
